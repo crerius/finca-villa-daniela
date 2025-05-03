@@ -1,0 +1,84 @@
+// schema.prisma (Modificado)
+// Fecha: 26 de abril de 2025
+// Hora: 02:03 PM
+// Ubicación: Villavicencio, Meta, Colombia
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  hashedPassword String?   // <--- NUEVO CAMPO para guardar la contraseña hasheada (opcional)
+
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Account {
+  id                 String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId             String  @db.ObjectId
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Añadido onDelete Cascade
+
+  @@unique([provider, providerAccountId]) // Índice único para cuentas
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Añadido onDelete Cascade
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model BusyDateRange {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  start     DateTime
+  end       DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([start, end])
+}
+
+model GalleryImage {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  filename   String   // Corresponde a public_id de Cloudinary
+  url        String   // URL segura de Cloudinary
+  altText    String?
+  uploadedAt DateTime @default(now())
+  // orderIndex Int?    // Campo para Fase 2 (ordenamiento manual) - Descomentar después
+
+  @@index([uploadedAt])
+  // @@index([orderIndex]) // Índice para Fase 2
+}
