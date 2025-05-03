@@ -6,6 +6,7 @@ import "./globals.css";
 import Providers from './providers';
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils"; // Importar cn para combinar clases
+import { Analytics } from "@vercel/analytics/react"
 
 // Configuración fuentes base (Geist)
 const geistSans = Geist({
@@ -51,6 +52,7 @@ export default function RootLayout({
         <Providers> {/* El SessionProvider está aquí dentro */}
           {children}
         </Providers>
+        <Analytics />
         <Toaster richColors position="top-right" />
       </body>
     </html>

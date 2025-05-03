@@ -10,7 +10,7 @@ import { Calendar, Phone, Star, Car, Clock, AlertTriangle, MessageCircle, MapPin
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CalendarioMejorado from '@/components/CalendarioMejorado';
 import WhatsappButton from '@/components/WhatsappButton';
-// import { toast } from 'sonner';
+
 
 // --- TIPO DEFINIDO para el estado de Pico y Placa ---
 interface PicoPlacaInfo {
@@ -29,11 +29,11 @@ export default function Home() {
     const fecha = new Date();
     const diaSemana = fecha.getDay();
     const picoPlaca: { [key: number]: PicoPlacaInfo } = {
-      1: { dia: "Lunes", placas: ["1", "2"], horarios: ["6:00 AM - 8:00 AM", "11:30 AM - 2:00 PM", "5:00 PM - 7:30 PM"] },
-      2: { dia: "Martes", placas: ["3", "4"], horarios: ["6:00 AM - 8:00 AM", "11:30 AM - 2:00 PM", "5:00 PM - 7:30 PM"] },
-      3: { dia: "Miércoles", placas: ["5", "6"], horarios: ["6:00 AM - 8:00 AM", "11:30 AM - 2:00 PM", "5:00 PM - 7:30 PM"] },
-      4: { dia: "Jueves", placas: ["7", "8"], horarios: ["6:00 AM - 8:00 AM", "11:30 AM - 2:00 PM", "5:00 PM - 7:30 PM"] },
-      5: { dia: "Viernes", placas: ["9", "0"], horarios: ["6:00 AM - 8:00 AM", "11:30 AM - 2:00 PM", "5:00 PM - 7:30 PM"] },
+      1: { dia: "Lunes", placas: ["1", "2"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
+      2: { dia: "Martes", placas: ["3", "4"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
+      3: { dia: "Miércoles", placas: ["5", "6"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
+      4: { dia: "Jueves", placas: ["7", "8"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
+      5: { dia: "Viernes", placas: ["9", "0"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
       6: { dia: "Sábado", placas: [], horarios: [] },
       0: { dia: "Domingo", placas: [], horarios: [] },
     };
@@ -130,17 +130,29 @@ export default function Home() {
               Bienvenidos a Nuestro Paraíso
             </h2>
             <Tabs defaultValue="ubicacion" className="w-full">
-              <TabsList className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 w-full">
-                <TabsTrigger value="ubicacion" className="rounded-full px-4 sm:px-5 py-2 text-[#003049] font-lobster text-base sm:text-lg bg-white border border-[#003049]/30 shadow-sm transition-all duration-300 data-[state=active]:bg-[#003049] data-[state=active]:text-white">
+              {/* *** CORRECCIÓN RESPONSIVE TABS RE-APLICADA *** */}
+              <TabsList className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 w-full"> {/* gap-2 en móvil, gap-3 desde sm */}
+                <TabsTrigger
+                  value="ubicacion"
+                  className="rounded-full px-4 sm:px-5 py-2 text-[#003049] font-lobster text-base sm:text-lg bg-white border border-[#003049]/30 shadow-sm transition-all duration-300 data-[state=active]:bg-[#003049] data-[state=active]:text-white" // px-4 text-base en móvil
+                >
                   ¿Dónde estamos?
                 </TabsTrigger>
-                <TabsTrigger value="disponibles" className="rounded-full px-4 sm:px-5 py-2 text-[#003049] font-lobster text-base sm:text-lg bg-white border border-[#003049]/30 shadow-sm transition-all duration-300 data-[state=active]:bg-[#003049] data-[state=active]:text-white">
+                <TabsTrigger
+                  value="disponibles"
+                  className="rounded-full px-4 sm:px-5 py-2 text-[#003049] font-lobster text-base sm:text-lg bg-white border border-[#003049]/30 shadow-sm transition-all duration-300 data-[state=active]:bg-[#003049] data-[state=active]:text-white" // px-4 text-base en móvil
+                >
                   Servicios
                 </TabsTrigger>
-                <TabsTrigger value="interes" className="rounded-full px-4 sm:px-5 py-2 text-[#003049] font-lobster text-base sm:text-lg bg-white border border-[#003049]/30 shadow-sm transition-all duration-300 data-[state=active]:bg-[#003049] data-[state=active]:text-white">
+                <TabsTrigger
+                  value="interes"
+                  className="rounded-full px-4 sm:px-5 py-2 text-[#003049] font-lobster text-base sm:text-lg bg-white border border-[#003049]/30 shadow-sm transition-all duration-300 data-[state=active]:bg-[#003049] data-[state=active]:text-white" // px-4 text-base en móvil
+                >
                   Puntos de interés
                 </TabsTrigger>
               </TabsList>
+
+              
               <TabsContent value="ubicacion">
                 <div className="space-y-6">
                   <p className="text-[#003049] text-base md:text-lg text-center max-w-3xl mx-auto">
@@ -148,7 +160,7 @@ export default function Home() {
                   </p>
                   <div className="w-full h-[300px] sm:h-[400px] rounded-lg overflow-hidden shadow-md border border-gray-200">
                     <iframe
-                      src="about:blank" // REEMPLAZAR URL
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.431500889901!2d-73.5516548!3d4.1352009999999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3e2956c576b149%3A0x5602dfb26503200b!2sFinca%20Villa%20Daniela!5e0!3m2!1ses-419!2sco!4v1746251292735!5m2!1ses-419!2sco" // REEMPLAZAR URL
                       width="100%"
                       height="100%"
                       style={{ border: 0 }}
