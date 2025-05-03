@@ -29,11 +29,11 @@ export default function Home() {
     const fecha = new Date();
     const diaSemana = fecha.getDay();
     const picoPlaca: { [key: number]: PicoPlacaInfo } = {
-      1: { dia: "Lunes", placas: ["1", "2"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
-      2: { dia: "Martes", placas: ["3", "4"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
-      3: { dia: "Miércoles", placas: ["5", "6"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
-      4: { dia: "Jueves", placas: ["7", "8"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
-      5: { dia: "Viernes", placas: ["9", "0"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
+      1: { dia: "Lunes", placas: ["7", "8"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
+      2: { dia: "Martes", placas: ["9", "0"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
+      3: { dia: "Miércoles", placas: ["1", "2"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
+      4: { dia: "Jueves", placas: ["3", "4"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
+      5: { dia: "Viernes", placas: ["5", "6"], horarios: ["6:30 AM - 9:30 AM",  "5:00 PM - 8:00 PM"] },
       6: { dia: "Sábado", placas: [], horarios: [] },
       0: { dia: "Domingo", placas: [], horarios: [] },
     };
@@ -320,11 +320,11 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-b bg-white hover:bg-gray-50"><td className="py-2 px-3 sm:py-3 sm:px-4 font-medium">Lunes</td><td className="py-2 px-3 sm:py-3 sm:px-4">1 y 2</td><td className="py-2 px-3 sm:py-3 sm:px-4 hidden md:table-cell">6-8 AM, 11:30AM-2PM, 5-7:30PM</td></tr>
-                    <tr className="border-b bg-gray-50 hover:bg-gray-100"><td className="py-2 px-3 sm:py-3 sm:px-4 font-medium">Martes</td><td className="py-2 px-3 sm:py-3 sm:px-4">3 y 4</td><td className="py-2 px-3 sm:py-3 sm:px-4 hidden md:table-cell">6-8 AM, 11:30AM-2PM, 5-7:30PM</td></tr>
-                    <tr className="border-b bg-white hover:bg-gray-50"><td className="py-2 px-3 sm:py-3 sm:px-4 font-medium">Miércoles</td><td className="py-2 px-3 sm:py-3 sm:px-4">5 y 6</td><td className="py-2 px-3 sm:py-3 sm:px-4 hidden md:table-cell">6-8 AM, 11:30AM-2PM, 5-7:30PM</td></tr>
-                    <tr className="border-b bg-gray-50 hover:bg-gray-100"><td className="py-2 px-3 sm:py-3 sm:px-4 font-medium">Jueves</td><td className="py-2 px-3 sm:py-3 sm:px-4">7 y 8</td><td className="py-2 px-3 sm:py-3 sm:px-4 hidden md:table-cell">6-8 AM, 11:30AM-2PM, 5-7:30PM</td></tr>
-                    <tr className="border-b bg-white hover:bg-gray-50"><td className="py-2 px-3 sm:py-3 sm:px-4 font-medium">Viernes</td><td className="py-2 px-3 sm:py-3 sm:px-4">9 y 0</td><td className="py-2 px-3 sm:py-3 sm:px-4 hidden md:table-cell">6-8 AM, 11:30AM-2PM, 5-7:30PM</td></tr>
+                    <tr className="border-b bg-white hover:bg-gray-50"><td className="py-2 px-3 sm:py-3 sm:px-4 font-medium">Lunes</td><td className="py-2 px-3 sm:py-3 sm:px-4">7 y 8</td><td className="py-2 px-3 sm:py-3 sm:px-4 hidden md:table-cell">6:30 - 9:30AM, 5:00 - 8:00PM</td></tr>
+                    <tr className="border-b bg-gray-50 hover:bg-gray-100"><td className="py-2 px-3 sm:py-3 sm:px-4 font-medium">Martes</td><td className="py-2 px-3 sm:py-3 sm:px-4">9 y 0</td><td className="py-2 px-3 sm:py-3 sm:px-4 hidden md:table-cell">6:30 - 9:30AM, 5:00 - 8:00PM</td></tr>
+                    <tr className="border-b bg-white hover:bg-gray-50"><td className="py-2 px-3 sm:py-3 sm:px-4 font-medium">Miércoles</td><td className="py-2 px-3 sm:py-3 sm:px-4">1 y 2</td><td className="py-2 px-3 sm:py-3 sm:px-4 hidden md:table-cell">6:30 - 9:30AM, 5:00 - 8:00PM</td></tr>
+                    <tr className="border-b bg-gray-50 hover:bg-gray-100"><td className="py-2 px-3 sm:py-3 sm:px-4 font-medium">Jueves</td><td className="py-2 px-3 sm:py-3 sm:px-4">3 y 4</td><td className="py-2 px-3 sm:py-3 sm:px-4 hidden md:table-cell">6:30 - 9:30AM, 5:00 - 8:00PM</td></tr>
+                    <tr className="border-b bg-white hover:bg-gray-50"><td className="py-2 px-3 sm:py-3 sm:px-4 font-medium">Viernes</td><td className="py-2 px-3 sm:py-3 sm:px-4">5 y 6</td><td className="py-2 px-3 sm:py-3 sm:px-4 hidden md:table-cell">6:30 - 9:30AM, 5:00 - 8:00PM</td></tr>
                     <tr className="border-b bg-green-50"><td className="py-2 px-3 sm:py-3 sm:px-4 font-medium">Sábado</td><td className="py-2 px-3 sm:py-3 sm:px-4 text-green-700 font-semibold">Sin restricción*</td><td className="py-2 px-3 sm:py-3 sm:px-4 hidden md:table-cell">-</td></tr>
                     <tr className="bg-green-50"><td className="py-2 px-3 sm:py-3 sm:px-4 font-medium">Domingo/Festivo</td><td className="py-2 px-3 sm:py-3 sm:px-4 text-green-700 font-semibold">Sin restricción*</td><td className="py-2 px-3 sm:py-3 sm:px-4 hidden md:table-cell">-</td></tr>
                   </tbody>
@@ -411,7 +411,7 @@ export default function Home() {
                     <div>
                       <p className="font-semibold text-[#003049]">Correo Electrónico:</p>
                       <a href="mailto:fincavilladanielameta@gmail.com" className="text-blue-600 hover:text-blue-800 hover:underline break-words">
-                        fincavilladanielameta@gmail.com
+                        admin@fincavilladaniela.com.co
                       </a>
                        <p className="text-xs sm:text-sm text-gray-500">Para consultas y cotizaciones</p>
                     </div>
@@ -455,6 +455,9 @@ export default function Home() {
             </div>
             <p className="text-xs text-gray-400">
               © {currentYear} Finca Villa Daniela. Todos los derechos reservados.
+            </p>
+            <p className="text-xs text-gray-500 mt-1"> {/* Puedes ajustar el color/margen */}
+              Creado por TecnoImports {/* Opcional: Añadir un enlace: <a href="tu_enlace" className="hover:underline">TecnoImports</a> */}
             </p>
           </footer>
         </section>
