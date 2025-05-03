@@ -1,13 +1,11 @@
 // src/app/api/availability/route.ts
-// Código CORREGIDO para errores ESLint/TypeScript
+// Código CORREGIDO v3 para errores ESLint/TypeScript
 // Fecha: 02 de mayo de 2025
-// Hora: 08:15 PM
+// Hora: 09:15 PM
 // Ubicación: Villavicencio, Meta, Colombia
 
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-// *** CORRECCIÓN: Eliminar import no usado ***
-// import { startOfDay } from 'date-fns';
 
 // --- Instanciación de Prisma Client (CORREGIDA) ---
 declare global {
@@ -26,8 +24,8 @@ if (process.env.NODE_ENV === 'production') {
 // --- Fin Instanciación ---
 
 // GET: Devuelve la lista de rangos ocupados
-// *** CORRECCIÓN: Añadir '_' a req ya que no se usa ***
-export async function GET(_req: Request) {
+// *** CORRECCIÓN v3: Parámetro _req ELIMINADO completamente ***
+export async function GET() { // <-- Sin parámetros
   try {
     const busyRanges = await prisma.busyDateRange.findMany({
       select: {
@@ -42,8 +40,7 @@ export async function GET(_req: Request) {
     // Devolver directamente los objetos Date, el frontend los parseará
     return NextResponse.json(busyRanges);
 
-  // *** CORRECCIÓN: Usar unknown en catch ***
-  } catch (error: unknown) {
+  } catch (error: unknown) { // Usar unknown
     console.error(`[${new Date().toISOString()}] Error fetching availability:`, error);
     let message = 'Error al obtener la disponibilidad';
     // Extraer mensaje si es instancia de Error

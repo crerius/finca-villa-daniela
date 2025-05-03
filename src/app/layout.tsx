@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Lobster } from 'next/font/google';
 import Providers from './providers'; // ⬅️ Importa aquí
 import { Toaster } from "@/components/ui/sonner";
 
-const lobster = Lobster({
-  weight: '400',
-  subsets: ['latin'],
-  variable: '--font-lobster',
-});
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

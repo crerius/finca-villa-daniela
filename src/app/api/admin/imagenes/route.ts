@@ -1,14 +1,12 @@
 // src/app/api/admin/imagenes/route.ts
-// Código CORREGIDO para errores ESLint/TypeScript
+// Código CORREGIDO v4 para errores ESLint/TypeScript
 // Fecha: 02 de mayo de 2025
-// Hora: 08:05 PM
+// Hora: 10:07 PM // Actualizado
 // Ubicación: Villavicencio, Meta, Colombia
 
 import { NextResponse, NextRequest } from 'next/server';
 import { auth } from '@/lib/auth';
-// *** CORRECCIÓN: Quitar ', Prisma' si no se usa instanceof Prisma... ***
 import { PrismaClient } from '@prisma/client';
-// *** CORRECCIÓN: Importar UploadApiResponse directamente ***
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 
 // --- Instanciación de Prisma Client (CORREGIDA) ---
@@ -62,7 +60,6 @@ export async function POST(req: NextRequest) { // req SÍ se usa aquí
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Subir imagen a Cloudinary usando upload_stream
     const uploadResult = await new Promise<UploadApiResponse | undefined>((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
             {
@@ -77,15 +74,11 @@ export async function POST(req: NextRequest) { // req SÍ se usa aquí
         uploadStream.end(buffer);
     });
 
-    if (!uploadResult) {
-        throw new Error('La subida a Cloudinary no devolvió resultado.');
-    }
-    if (!uploadResult.secure_url) {
-        console.error("Cloudinary result missing secure_url:", uploadResult);
-        throw new Error('La respuesta de Cloudinary no incluyó una URL segura.');
+    if (!uploadResult || !uploadResult.secure_url) {
+        console.error("Cloudinary upload failed or missing secure_url:", uploadResult);
+        throw new Error('Error en la subida a Cloudinary o URL no encontrada.');
     }
 
-    // Guardar información en la base de datos
     const newGalleryImage = await prisma.galleryImage.create({
         data: {
             filename: uploadResult.public_id || file.name,
@@ -94,40 +87,31 @@ export async function POST(req: NextRequest) { // req SÍ se usa aquí
         },
     });
 
-    console.log(`[${new Date().toISOString()}] Image uploaded successfully to Cloudinary and DB:`, newGalleryImage.id);
+    console.log(`[${new Date().toISOString()}] Image uploaded:`, newGalleryImage.id);
     return NextResponse.json(newGalleryImage, { status: 201 });
 
-  } catch (error: unknown) { // *** CORRECCIÓN: Usar unknown ***
+  } catch (error: unknown) { // Usar unknown
     console.error(`[${new Date().toISOString()}] Error processing image upload:`, error);
-    let errorMessage = 'Error interno del servidor al subir la imagen.';
-    // Extraer mensaje si es una instancia de Error
-    if (error instanceof Error) {
-        errorMessage = error.message;
-    }
-    return NextResponse.json({ message: errorMessage }, { status: 500 });
+    let message = 'Error interno del servidor al subir la imagen.';
+    if (error instanceof Error) { message = error.message; }
+    return NextResponse.json({ message }, { status: 500 });
   }
 }
 
 // GET - Obtener lista de imágenes
-// *** CORRECCIÓN: Añadir '_' a req ya que no se usa ***
-export async function GET(_req: NextRequest) {
+// *** CORRECCIÓN v4: Parámetro _req ELIMINADO completamente ***
+export async function GET() { // <-- Sin parámetros
     const session = await auth();
     if (!session?.user) {
         return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
     }
     try {
-        const images = await prisma.galleryImage.findMany({
-            orderBy: {
-                uploadedAt: 'desc'
-            }
-        });
+        const images = await prisma.galleryImage.findMany({ orderBy: { uploadedAt: 'desc' } });
         return NextResponse.json(images);
-    } catch (error: unknown) { // *** CORRECCIÓN: Usar unknown ***
+    } catch (error: unknown) { // Usar unknown
         console.error(`[${new Date().toISOString()}] Error fetching gallery images:`, error);
         let message = 'Error al obtener imágenes de la galería';
-        if (error instanceof Error) {
-            message = error.message;
-        }
-        return NextResponse.json({ message: message }, { status: 500 });
+        if (error instanceof Error) { message = error.message; }
+        return NextResponse.json({ message }, { status: 500 });
     }
 }

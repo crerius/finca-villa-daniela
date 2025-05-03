@@ -1,7 +1,7 @@
 // src/app/api/gallery/route.ts
-// Código CORREGIDO para errores ESLint/TypeScript
+// Código CORREGIDO v4 para errores ESLint/TypeScript
 // Fecha: 02 de mayo de 2025
-// Hora: 08:00 PM
+// Hora: 10:07 PM // Actualizado
 // Ubicación: Villavicencio, Meta, Colombia
 
 import { NextResponse } from 'next/server';
@@ -24,8 +24,8 @@ if (process.env.NODE_ENV === 'production') {
 // --- Fin Instanciación ---
 
 // GET: Devuelve la lista de imágenes para la galería pública
-// *** CORRECCIÓN: Añadir '_' a req ya que no se usa ***
-export async function GET(_req: Request) {
+// *** CORRECCIÓN v4: Parámetro _req ELIMINADO completamente ***
+export async function GET() { // <-- Sin parámetros
   try {
     const images = await prisma.galleryImage.findMany({
       select: { // Selecciona solo lo necesario
@@ -40,8 +40,7 @@ export async function GET(_req: Request) {
       },
     });
     return NextResponse.json(images);
-  // *** CORRECCIÓN: Usar unknown en catch ***
-  } catch (error: unknown) {
+  } catch (error: unknown) { // Usar unknown
     console.error(`[${new Date().toISOString()}] Error fetching public gallery images:`, error);
     let message = 'Error al obtener las imágenes de la galería';
     // Extraer mensaje si es instancia de Error

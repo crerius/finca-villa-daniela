@@ -1,7 +1,6 @@
 // app/dashboard/page.tsx
 import { auth } from '@/lib/auth'; // Importa para obtener sesión en el servidor
 import { redirect } from 'next/navigation';
-import Link from 'next/link'; // Para enlaces de navegación si los necesitas
 import AuthStatus from '@/components/AuthStatus'; // Reutiliza o crea un componente similar aquí
 
 // Importa los componentes que crearemos para las secciones

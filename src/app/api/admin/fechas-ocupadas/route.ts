@@ -1,21 +1,20 @@
 // src/app/api/admin/fechas-ocupadas/route.ts
-// Código CORREGIDO para errores ESLint/TypeScript
+// Código CORREGIDO v3 para errores ESLint/TypeScript
 // Fecha: 02 de mayo de 2025
-// Hora: 07:55 PM
+// Hora: 09:11 PM
 // Ubicación: Villavicencio, Meta, Colombia
 
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { startOfDay } from 'date-fns';
-// *** CORRECCIÓN: Añadir import de Prisma ***
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client'; // Importar Prisma
 
 // --- Instanciación de Prisma Client (CORRECTA) ---
-let prisma: PrismaClient;
 declare global {
   // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined;
 }
+let prisma: PrismaClient;
 if (process.env.NODE_ENV === 'production') {
   prisma = new PrismaClient();
 } else {
@@ -27,8 +26,8 @@ if (process.env.NODE_ENV === 'production') {
 // --- Fin Instanciación ---
 
 // GET: Obtener todas las fechas ocupadas
-// *** CORRECCIÓN: Añadir '_' a req ya que no se usa ***
-export async function GET(_req: Request) {
+// *** CORRECCIÓN v3: Parámetro _req ELIMINADO completamente ***
+export async function GET() { // <-- Sin parámetros
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
@@ -39,20 +38,20 @@ export async function GET(_req: Request) {
       orderBy: { start: 'asc' },
     });
     return NextResponse.json(busyRanges);
-  } catch (error: unknown) { // *** CORRECCIÓN: Usar unknown en catch ***
+  } catch (error: unknown) { // Usar unknown
     console.error(`[${new Date().toISOString()}] Error fetching busy dates:`, error);
-    // Opcional: extraer mensaje si es Error
+    // *** CORRECCIÓN v3: Usar la variable message en el return ***
     let message = 'Error interno del servidor al obtener fechas';
     if (error instanceof Error) {
-        message = error.message; // Podría dar más detalles si el error tiene mensaje
+        message = error.message; // Asigna el mensaje del error si existe
     }
-    // Devolver mensaje genérico o el del error
-    return NextResponse.json({ message: 'Error interno del servidor al obtener fechas' }, { status: 500 });
+    // Usa la variable 'message' aquí:
+    return NextResponse.json({ message: message }, { status: 500 }); // <-- Usa la variable
   }
 }
 
 // POST: Actualizar/Reemplazar TODAS las fechas ocupadas
-export async function POST(req: Request) { // req SÍ se usa aquí (req.json())
+export async function POST(req: Request) { // req SÍ se usa aquí
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
@@ -70,7 +69,6 @@ export async function POST(req: Request) { // req SÍ se usa aquí (req.json())
 
     const newRanges: { start: string | Date; end: string | Date }[] = body.ranges;
 
-    // Validación y normalización
     const validatedRanges = newRanges.map((range, index) => {
       if (!range || typeof range.start === 'undefined' || typeof range.end === 'undefined') {
         console.error(`[${new Date().toISOString()}] Validation failed: Invalid range object at index ${index}:`, range);
@@ -90,7 +88,6 @@ export async function POST(req: Request) { // req SÍ se usa aquí (req.json())
       return { start, end };
     });
 
-    // Transacción: Borra todo lo anterior e inserta lo nuevo
     await prisma.$transaction(async (tx) => {
       await tx.busyDateRange.deleteMany({});
       if (validatedRanges.length > 0) {
@@ -104,27 +101,24 @@ export async function POST(req: Request) { // req SÍ se usa aquí (req.json())
 
     return NextResponse.json({ message: 'Fechas actualizadas correctamente' }, { status: 200 });
 
-  } catch (error: unknown) { // *** CORRECCIÓN: Usar unknown en catch ***
+  } catch (error: unknown) { // Usar unknown
     console.error(`[${new Date().toISOString()}] Error processing POST /api/admin/fechas-ocupadas:`, error);
 
     let errorMessage = 'Error interno del servidor al actualizar fechas';
     let errorStatus = 500;
 
-    // *** CORRECCIÓN: Usar Prisma (P mayúscula) y chequear 'error instanceof Error' ***
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) { // Usar Prisma (P mayúscula)
         console.error('Prisma Error Code:', error.code);
-        errorMessage = `Error de base de datos: (${error.code})`; // Mensaje más genérico
-        errorStatus = 409; // Conflict
-    } else if (error instanceof Error) { // Chequeo si es Error estándar
+        errorMessage = `Error de base de datos: (${error.code})`;
+        errorStatus = 409;
+    } else if (error instanceof Error) {
         if (error.message.includes('inválido') || error.message.includes('Invalid')) {
             errorMessage = `Error de validación: ${error.message}`;
-            errorStatus = 400; // Bad Request
+            errorStatus = 400;
         } else {
-            // Otro error estándar, usar su mensaje si existe
             errorMessage = error.message || errorMessage;
         }
     }
-
     return NextResponse.json({ message: errorMessage }, { status: errorStatus });
   }
 }
