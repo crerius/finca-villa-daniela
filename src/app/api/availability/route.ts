@@ -1,24 +1,33 @@
+// src/app/api/availability/route.ts
+// Código CORREGIDO para errores ESLint/TypeScript
+// Fecha: 02 de mayo de 2025
+// Hora: 08:15 PM
+// Ubicación: Villavicencio, Meta, Colombia
+
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { startOfDay } from 'date-fns'; // Asegurar fechas sin hora
+// *** CORRECCIÓN: Eliminar import no usado ***
+// import { startOfDay } from 'date-fns';
 
-// --- Instanciación de Prisma Client ---
-let prisma: PrismaClient;
+// --- Instanciación de Prisma Client (CORREGIDA) ---
 declare global {
+  // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined;
 }
+let prisma: PrismaClient;
 if (process.env.NODE_ENV === 'production') {
   prisma = new PrismaClient();
 } else {
-  if (!global.prisma) {
-    global.prisma = new PrismaClient();
+  if (!globalThis.prisma) {
+    globalThis.prisma = new PrismaClient();
   }
-  prisma = global.prisma;
+  prisma = globalThis.prisma;
 }
 // --- Fin Instanciación ---
 
 // GET: Devuelve la lista de rangos ocupados
-export async function GET(req: Request) {
+// *** CORRECCIÓN: Añadir '_' a req ya que no se usa ***
+export async function GET(_req: Request) {
   try {
     const busyRanges = await prisma.busyDateRange.findMany({
       select: {
@@ -30,11 +39,17 @@ export async function GET(req: Request) {
       },
     });
 
+    // Devolver directamente los objetos Date, el frontend los parseará
     return NextResponse.json(busyRanges);
 
-
-  } catch (error) {
+  // *** CORRECCIÓN: Usar unknown en catch ***
+  } catch (error: unknown) {
     console.error(`[${new Date().toISOString()}] Error fetching availability:`, error);
-    return NextResponse.json({ message: 'Error al obtener la disponibilidad' }, { status: 500 });
+    let message = 'Error al obtener la disponibilidad';
+    // Extraer mensaje si es instancia de Error
+    if (error instanceof Error) {
+        message = error.message;
+    }
+    return NextResponse.json({ message: message }, { status: 500 });
   }
 }

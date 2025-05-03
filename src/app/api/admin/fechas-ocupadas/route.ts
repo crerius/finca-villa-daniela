@@ -1,41 +1,36 @@
-// app/api/admin/fechas-ocupadas/route.ts
-// Código LIMPIO Y FINALIZADO
-// Fecha: 26 de abril de 2025
-// Hora: 11:37 AM
+// src/app/api/admin/fechas-ocupadas/route.ts
+// Código CORREGIDO para errores ESLint/TypeScript
+// Fecha: 02 de mayo de 2025
+// Hora: 07:55 PM
 // Ubicación: Villavicencio, Meta, Colombia
 
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { PrismaClient, Prisma } from '@prisma/client';
 import { startOfDay } from 'date-fns';
+// *** CORRECCIÓN: Añadir import de Prisma ***
+import { PrismaClient, Prisma } from '@prisma/client';
 
-// --- Instanciación de Prisma Client (recomendado para Next.js) ---
+// --- Instanciación de Prisma Client (CORRECTA) ---
 let prisma: PrismaClient;
 declare global {
+  // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined;
 }
 if (process.env.NODE_ENV === 'production') {
   prisma = new PrismaClient();
 } else {
-  if (!global.prisma) {
-    global.prisma = new PrismaClient({
-        // Puedes descomentar logs de Prisma si necesitas depurar BD en el futuro
-        // log: ['query', 'info', 'warn', 'error'],
-    });
+  if (!globalThis.prisma) {
+    globalThis.prisma = new PrismaClient();
   }
-  prisma = global.prisma;
+  prisma = globalThis.prisma;
 }
 // --- Fin Instanciación ---
 
-
 // GET: Obtener todas las fechas ocupadas
-export async function GET(req: Request) {
-  // Log mínimo para saber que se llamó
-  // console.log(`[${new Date().toISOString()}] GET /api/admin/fechas-ocupadas request received.`);
-
+// *** CORRECCIÓN: Añadir '_' a req ya que no se usa ***
+export async function GET(_req: Request) {
   const session = await auth();
   if (!session?.user) {
-    // console.log(`[${new Date().toISOString()}] Unauthorized access attempt.`); // Opcional loguear intentos no autorizados
     return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
   }
 
@@ -43,31 +38,30 @@ export async function GET(req: Request) {
     const busyRanges = await prisma.busyDateRange.findMany({
       orderBy: { start: 'asc' },
     });
-    // Devolvemos directamente los objetos con fechas, Prisma/Next se encargan de serializar
     return NextResponse.json(busyRanges);
-  } catch (error) {
-    console.error(`[${new Date().toISOString()}] Error fetching busy dates:`, error); // Loguear errores es importante
+  } catch (error: unknown) { // *** CORRECCIÓN: Usar unknown en catch ***
+    console.error(`[${new Date().toISOString()}] Error fetching busy dates:`, error);
+    // Opcional: extraer mensaje si es Error
+    let message = 'Error interno del servidor al obtener fechas';
+    if (error instanceof Error) {
+        message = error.message; // Podría dar más detalles si el error tiene mensaje
+    }
+    // Devolver mensaje genérico o el del error
     return NextResponse.json({ message: 'Error interno del servidor al obtener fechas' }, { status: 500 });
   }
 }
 
 // POST: Actualizar/Reemplazar TODAS las fechas ocupadas
-export async function POST(req: Request) {
-  // Log mínimo para saber que se llamó
-  // console.log(`[${new Date().toISOString()}] POST /api/admin/fechas-ocupadas request received.`);
-
+export async function POST(req: Request) { // req SÍ se usa aquí (req.json())
   const session = await auth();
   if (!session?.user) {
-    // console.log(`[${new Date().toISOString()}] Unauthorized access attempt.`);
     return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
   }
 
   try {
     const body = await req.json();
-    // console.log(`[${new Date().toISOString()}] Received body:`, JSON.stringify(body, null, 2)); // Log de depuración eliminado
 
     if (!body || !Array.isArray(body.ranges)) {
-      // console.log(`[${new Date().toISOString()}] Invalid data format: 'ranges' key missing or not an array.`); // Log de depuración eliminado
       return NextResponse.json(
         { message: 'Formato de datos inválido: se esperaba un objeto con la propiedad "ranges" (array).' },
         { status: 400 }
@@ -75,12 +69,10 @@ export async function POST(req: Request) {
     }
 
     const newRanges: { start: string | Date; end: string | Date }[] = body.ranges;
-    // console.log(`[${new Date().toISOString()}] Received ${newRanges.length} ranges.`); // Log de depuración eliminado
 
     // Validación y normalización
     const validatedRanges = newRanges.map((range, index) => {
       if (!range || typeof range.start === 'undefined' || typeof range.end === 'undefined') {
-        // Loguear el error de validación puede ser útil
         console.error(`[${new Date().toISOString()}] Validation failed: Invalid range object at index ${index}:`, range);
         throw new Error(`Objeto de rango inválido en el índice ${index}.`);
       }
@@ -98,43 +90,41 @@ export async function POST(req: Request) {
       return { start, end };
     });
 
-    // console.log(`[${new Date().toISOString()}] Validated ranges (${validatedRanges.length}):`, JSON.stringify(validatedRanges, null, 2)); // Log de depuración eliminado
-
     // Transacción: Borra todo lo anterior e inserta lo nuevo
     await prisma.$transaction(async (tx) => {
-      // console.log(`[${new Date().toISOString()}] Starting transaction. Deleting all existing busyDateRange records...`); // Log de depuración eliminado
       await tx.busyDateRange.deleteMany({});
-      // console.log(`[${new Date().toISOString()}] Delete completed.`); // Log de depuración eliminado
-
       if (validatedRanges.length > 0) {
-        // console.log(`[${new Date().toISOString()}] Attempting to create ${validatedRanges.length} ranges individually.`); // Log de depuración eliminado
-        // Usar create individualmente (mejor para MongoDB en algunos casos)
         for (const range of validatedRanges) {
           await tx.busyDateRange.create({
             data: { start: range.start, end: range.end }
           });
         }
-        // console.log(`[${new Date().toISOString()}] Creation of all ranges completed successfully.`); // Log de depuración eliminado
-      } else {
-        // console.log(`[${new Date().toISOString()}] Validated ranges array is empty. Skipping creation.`); // Log de depuración eliminado
       }
     });
 
-    // console.log(`[${new Date().toISOString()}] Transaction completed successfully.`); // Log de depuración eliminado
     return NextResponse.json({ message: 'Fechas actualizadas correctamente' }, { status: 200 });
 
-  } catch (error: any) {
-    // Loguear el error es importante
+  } catch (error: unknown) { // *** CORRECCIÓN: Usar unknown en catch ***
     console.error(`[${new Date().toISOString()}] Error processing POST /api/admin/fechas-ocupadas:`, error);
 
-    // Manejo de errores específico
+    let errorMessage = 'Error interno del servidor al actualizar fechas';
+    let errorStatus = 500;
+
+    // *** CORRECCIÓN: Usar Prisma (P mayúscula) y chequear 'error instanceof Error' ***
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
         console.error('Prisma Error Code:', error.code);
-        return NextResponse.json({ message: `Error de base de datos: ${error.message}` }, { status: 409 }); // Conflict
-    } else if (error.message.includes('inválido') || error.message.includes('Invalid')) {
-        return NextResponse.json({ message: `Error de validación: ${error.message}` }, { status: 400 }); // Bad Request
-    } else {
-        return NextResponse.json({ message: 'Error interno del servidor al actualizar fechas' }, { status: 500 }); // Internal Server Error
+        errorMessage = `Error de base de datos: (${error.code})`; // Mensaje más genérico
+        errorStatus = 409; // Conflict
+    } else if (error instanceof Error) { // Chequeo si es Error estándar
+        if (error.message.includes('inválido') || error.message.includes('Invalid')) {
+            errorMessage = `Error de validación: ${error.message}`;
+            errorStatus = 400; // Bad Request
+        } else {
+            // Otro error estándar, usar su mensaje si existe
+            errorMessage = error.message || errorMessage;
+        }
     }
+
+    return NextResponse.json({ message: errorMessage }, { status: errorStatus });
   }
 }

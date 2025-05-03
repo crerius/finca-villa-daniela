@@ -1,27 +1,29 @@
 // src/app/api/admin/imagenes/route.ts
-// Corrección del tipo UploadApiResponse
-// Fecha: 26 de abril de 2025
-// Hora: 12:06 PM
+// Código CORREGIDO para errores ESLint/TypeScript
+// Fecha: 02 de mayo de 2025
+// Hora: 08:05 PM
 // Ubicación: Villavicencio, Meta, Colombia
 
 import { NextResponse, NextRequest } from 'next/server';
 import { auth } from '@/lib/auth';
-import { PrismaClient, Prisma } from '@prisma/client';
-// *** CORRECCIÓN AQUÍ: Importar UploadApiResponse directamente ***
+// *** CORRECCIÓN: Quitar ', Prisma' si no se usa instanceof Prisma... ***
+import { PrismaClient } from '@prisma/client';
+// *** CORRECCIÓN: Importar UploadApiResponse directamente ***
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 
-// --- Instanciación de Prisma Client (sin cambios) ---
-let prisma: PrismaClient;
+// --- Instanciación de Prisma Client (CORREGIDA) ---
 declare global {
+  // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined;
 }
+let prisma: PrismaClient;
 if (process.env.NODE_ENV === 'production') {
   prisma = new PrismaClient();
 } else {
-  if (!global.prisma) {
-    global.prisma = new PrismaClient();
+  if (!globalThis.prisma) {
+    globalThis.prisma = new PrismaClient();
   }
-  prisma = global.prisma;
+  prisma = globalThis.prisma;
 }
 // --- Fin Instanciación ---
 
@@ -36,7 +38,7 @@ cloudinary.config({
 
 
 // POST: Manejar la subida de una nueva imagen
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest) { // req SÍ se usa aquí
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
@@ -61,7 +63,6 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     // Subir imagen a Cloudinary usando upload_stream
-    // *** CORRECCIÓN AQUÍ: Usar el tipo importado directamente ***
     const uploadResult = await new Promise<UploadApiResponse | undefined>((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
             {
@@ -70,12 +71,7 @@ export async function POST(req: NextRequest) {
                 quality: 'auto',
             },
             (error, result) => {
-                // El tipo 'result' aquí debería coincidir ahora con UploadApiResponse | undefined
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(result);
-                }
+                if (error) { reject(error); } else { resolve(result); }
             }
         );
         uploadStream.end(buffer);
@@ -84,17 +80,15 @@ export async function POST(req: NextRequest) {
     if (!uploadResult) {
         throw new Error('La subida a Cloudinary no devolvió resultado.');
     }
-    // Verificar si secure_url existe antes de usarlo
-     if (!uploadResult.secure_url) {
+    if (!uploadResult.secure_url) {
         console.error("Cloudinary result missing secure_url:", uploadResult);
         throw new Error('La respuesta de Cloudinary no incluyó una URL segura.');
     }
 
-
     // Guardar información en la base de datos
     const newGalleryImage = await prisma.galleryImage.create({
         data: {
-            filename: uploadResult.public_id || file.name, // Usar public_id si existe
+            filename: uploadResult.public_id || file.name,
             url: uploadResult.secure_url,
             altText: altText || null,
         },
@@ -103,18 +97,20 @@ export async function POST(req: NextRequest) {
     console.log(`[${new Date().toISOString()}] Image uploaded successfully to Cloudinary and DB:`, newGalleryImage.id);
     return NextResponse.json(newGalleryImage, { status: 201 });
 
-  } catch (error: any) {
+  } catch (error: unknown) { // *** CORRECCIÓN: Usar unknown ***
     console.error(`[${new Date().toISOString()}] Error processing image upload:`, error);
     let errorMessage = 'Error interno del servidor al subir la imagen.';
-    if (error.message) {
+    // Extraer mensaje si es una instancia de Error
+    if (error instanceof Error) {
         errorMessage = error.message;
     }
     return NextResponse.json({ message: errorMessage }, { status: 500 });
   }
 }
 
-// GET - Ejemplo básico (sin cambios)
-export async function GET(req: NextRequest) {
+// GET - Obtener lista de imágenes
+// *** CORRECCIÓN: Añadir '_' a req ya que no se usa ***
+export async function GET(_req: NextRequest) {
     const session = await auth();
     if (!session?.user) {
         return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
@@ -126,10 +122,12 @@ export async function GET(req: NextRequest) {
             }
         });
         return NextResponse.json(images);
-    } catch (error) {
+    } catch (error: unknown) { // *** CORRECCIÓN: Usar unknown ***
         console.error(`[${new Date().toISOString()}] Error fetching gallery images:`, error);
-        return NextResponse.json({ message: 'Error al obtener imágenes de la galería' }, { status: 500 });
+        let message = 'Error al obtener imágenes de la galería';
+        if (error instanceof Error) {
+            message = error.message;
+        }
+        return NextResponse.json({ message: message }, { status: 500 });
     }
 }
-
-// TODO: Implementar DELETE
