@@ -1,12 +1,12 @@
-// src/app/layout.tsx (Añadida fuente Lobster)
+// src/app/layout.tsx (Añadida fuente Lobster y SpeedInsights)
 import type { Metadata } from "next";
-// *** CORRECCIÓN: Importar Lobster y configurar ***
-import { Geist, Geist_Mono, Lobster } from "next/font/google"; // Añadir Lobster
+import { Geist, Geist_Mono, Lobster } from "next/font/google";
 import "./globals.css";
 import Providers from './providers';
 import { Toaster } from "@/components/ui/sonner";
-import { cn } from "@/lib/utils"; // Importar cn para combinar clases
-import { Analytics } from "@vercel/analytics/react"
+import { cn } from "@/lib/utils";
+// *** 1. Importar SpeedInsights ***
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // Configuración fuentes base (Geist)
 const geistSans = Geist({
@@ -19,12 +19,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// *** CORRECCIÓN: Configurar Lobster ***
+// Configurar Lobster
 const lobster = Lobster({
-  weight: "400", // Lobster solo tiene peso 400
+  weight: "400",
   subsets: ["latin"],
-  variable: "--font-lobster", // Definir una variable CSS para Lobster
-  display: 'swap', // Buena práctica para fuentes
+  variable: "--font-lobster",
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -39,21 +39,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      {/* *** CORRECCIÓN: Añadir variable de Lobster al body *** */}
-      {/* Usamos cn() para combinar clases de forma segura */}
       <body
         className={cn(
-            "antialiased", // Suavizado de fuente
-            geistSans.variable, // Variable CSS para Geist Sans
-            geistMono.variable, // Variable CSS para Geist Mono
-            lobster.variable // Variable CSS para Lobster
+            "antialiased",
+            geistSans.variable,
+            geistMono.variable,
+            lobster.variable
         )}
       >
-        <Providers> {/* El SessionProvider está aquí dentro */}
+        <Providers>
           {children}
         </Providers>
-        <Analytics />
         <Toaster richColors position="top-right" />
+        {/* *** 2. Añadir el componente SpeedInsights *** */}
+        {/* Usualmente se coloca justo antes de cerrar el body */}
+        <SpeedInsights />
       </body>
     </html>
   );
